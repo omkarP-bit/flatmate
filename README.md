@@ -1,202 +1,236 @@
-# 🏠 Flatmate — Smart Roommate Management System
+# Flatmate 🏠
 
-A production-ready microservices app to track shared expenses, split bills, and manage payments between flatmates.
-
----
-
-## 🧰 Tech Stack
-
-| Layer       | Technology                        |
-|-------------|-----------------------------------|
-| Frontend    | React 18, TypeScript, Vite, Zustand |
-| Backend     | FastAPI (Python 3.12), async      |
-| Database    | Supabase (PostgreSQL + Auth)      |
-| Cache       | Redis 7                           |
-| Gateway     | FastAPI reverse proxy + JWT auth  |
-| Containers  | Docker + Docker Compose           |
+Tired of the awkward "who paid for what?" conversations with your flatmates? Flatmate makes it simple to track shared expenses, split bills, and settle up — so you can focus on living together, not accounting together.
 
 ---
 
-## 📁 Project Structure
+## What is Flatmate?
+
+Flatmate is an app for people living together. Whether it's the monthly electricity bill, a grocery run, or the WiFi subscription — just log it, split it, and move on. Everyone in the flat can see what they owe and to whom, in real time.
+
+---
+
+## Core Features
+
+- **Rooms** — Create a flat, share an invite code, and your flatmates join in seconds.
+- **Expense Tracking** — Log any shared expense with a title, amount, and category.
+- **Smart Splits** — Split equally, set custom amounts, or split by percentage — your choice.
+- **Balance Summary** — Always know exactly who owes whom and how much, with debts automatically simplified.
+- **Payments** — Record a payment when you transfer money, and let the recipient confirm it.
+- **Smart Suggestions** — The app learns your patterns and reminds you when a recurring bill (like rent or electricity) is probably due again.
+- **Avatar & UPI** — Set a profile photo and your UPI ID so flatmates know how to pay you.
+
+---
+
+## How It Works
+
+1. One person creates a flat and shares the invite code.
+2. Flatmates join using the code.
+3. Whenever someone pays a shared expense, they log it in the app.
+4. Everyone can see the running balances — no spreadsheets, no WhatsApp debates.
+5. When someone transfers money, they mark it as a payment. The recipient confirms, and the balance clears.
+
+---
+
+## Project Structure
 
 ```
-flatmate/
-├── docker-compose.yml
-├── .env.example
-├── database/
-│   └── migrations/001_all_schemas.sql   ← Run this in Supabase first
-├── gateway/                             ← API Gateway (port 8000)
+flatmate-backend/
+├── shared/               # Common utilities used by all services
+│   ├── config.py         # Environment configuration
+│   ├── database.py       # Database connection
+│   ├── auth.py           # JWT authentication
+│   ├── cache.py          # Redis caching
+│   └── s3_client.py      # File storage helpers
+│
 ├── services/
-│   ├── user-service/    (port 8001)
-│   ├── room-service/    (port 8002)
-│   ├── expense-service/ (port 8003)     ← Core service
-│   └── payment-service/ (port 8004)
-└── frontend/                            ← React app (port 3000)
+│   ├── user-service/     # User profiles and avatars
+│   ├── room-service/     # Flat management and invites
+│   ├── expense-service/  # Expenses, splits, and balances
+    └── payment-service/  # Payment recording and settlement
+
 ```
+
+Each service is completely independent — its own codebase, its own deployment, its own responsibilities. They all share one database and one Redis cache.
 
 ---
 
-## 🚀 Quick Start
+## Services at a Glance
 
-### Step 1 — Supabase Setup
+| Service | What it owns |
+|---|---|
+| `user-service` | Profile creation, avatar uploads, user lookup |
+| `room-service` | Creating flats, invite codes, adding/removing members |
+| `expense-service` | Logging expenses, calculating splits, showing balances, smart suggestions |
+| `payment-service` | Recording payments, confirming settlements, payment history |
 
-1. Go to [supabase.com](https://supabase.com) → create a new project
-2. In your project dashboard → **SQL Editor**
-3. Paste the contents of `database/migrations/001_all_schemas.sql` and run it
-4. Go to **Settings → API** and copy:
-   - `Project URL` → `SUPABASE_URL`
-   - `anon public` key → `SUPABASE_ANON_KEY`
-   - `service_role` key → `SUPABASE_SERVICE_KEY`
-5. Go to **Settings → JWT** and copy the JWT Secret → `JWT_SECRET`
+---
 
-### Step 2 — Environment
+## Getting Started (for contributors)
+
+### Prerequisites
+
+- Python 3.12
+- AWS CLI configured
+- A running PostgreSQL instance
+- A running Redis instance
+
+### Local Setup
 
 ```bash
+# Clone the repo
+git clone https://github.com/your-org/flatmate-backend.git
+cd flatmate-backend
+
+# Create and activate a virtual environment
+python -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
+
+# Install dependencies for the service you're working on
+pip install -r services/expense-service/requirements.txt
+
+# Copy shared layer into the service for local running
+cp shared/* services/expense-service/src/
+
+# Set up environment variables
 cp .env.example .env
-# Fill in your values from Supabase
+# Fill in your local DB, Redis, and Cognito values
+
+# Run the service
+cd services/expense-service/src
+uvicorn main:app --reload --port 8003
 ```
 
-### Step 3 — Run Everything
+Each service runs on its own port locally:
+
+| Service | Port |
+|---|---|
+| user-service | 8080 |
+| room-service | 8002 |
+| expense-service | 3000 |
+| payment-service | 8080 |
+
+### Apply the Database Schema
 
 ```bash
-docker compose up --build
+psql -h localhost -U flatmate -d flatmate -f schema.sql
 ```
-
-That's it! Services start in order:
-
-| Service          | URL                          |
-|------------------|------------------------------|
-| Frontend         | http://localhost:3000         |
-| API Gateway      | http://localhost:8000         |
-| User Service     | http://localhost:8001/docs    |
-| Room Service     | http://localhost:8002/docs    |
-| Expense Service  | http://localhost:8003/docs    |
-| Payment Service  | http://localhost:8004/docs    |
 
 ---
 
-## 🧑‍💻 Local Development (without Docker)
+## Environment Variables
 
-Run each service individually for hot reload.
+Copy `.env.example` to `.env` and fill in your values. Every variable has a comment explaining what it does.
 
-### Backend services
+Key variables to set up locally:
 
+```env
+DB_HOST=localhost
+DB_NAME=flatmate
+DB_USER=flatmate
+DB_PASSWORD=yourpassword
+
+REDIS_URL=redis://localhost:6379
+
+COGNITO_USER_POOL_ID=ap-south-1_XXXXXXXXX
+COGNITO_CLIENT_ID=your-client-id
+
+ENVIRONMENT=development
+SERVICE_NAME=expense-service   # change per service you're running
+```
+
+---
+
+## How to Contribute
+
+We welcome contributions of all kinds — bug fixes, new features, documentation improvements, or tests.
+
+### Workflow
+
+1. **Fork** the repo and create a branch from `main`.
 ```bash
-# In each service folder:
-cd services/user-service
-pip install -r requirements.txt
-python main.py          # starts on the port in config.py
+   git checkout -b feature/your-feature-name
 ```
 
-### Frontend
+2. **Make your changes.** Keep each PR focused on one thing.
 
+3. **Test locally** by running the affected service with `uvicorn` and hitting the endpoints via Postman or `curl`.
+
+4. **Commit** with a clear message:
 ```bash
-cd frontend
-npm install
-npm run dev             # starts on http://localhost:3000
+   git commit -m "feat(expense-service): add receipt upload support"
 ```
 
-### Redis (local)
+5. **Open a Pull Request** against `main`. Describe what you changed and why.
 
-```bash
-# macOS
-brew install redis && brew services start redis
+### Commit Message Format
 
-# Ubuntu
-sudo apt install redis-server && sudo systemctl start redis
+We follow a simple convention:
+
 ```
+feat(service-name): short description       # new feature
+fix(service-name): short description        # bug fix
+refactor(service-name): short description   # refactor, no behaviour change
+docs: short description                     # documentation only
+chore: short description                    # build scripts, config, etc.
+```
+
+### Where to Start
+
+Good first issues for new contributors:
+
+- Adding input validation to an existing endpoint
+- Improving error messages to be more descriptive
+- Writing a helper function in the shared layer
+- Adding a new keyword rule in `smart_suggest.py` for a category
+- Improving the recurring suggestions logic
+
+If you're unsure where to begin, open an issue and ask — we're happy to help you find a good starting point.
 
 ---
 
-## 📡 API Reference
+## Codebase Conventions
 
-All requests go through the **gateway on port 8000**.
-Protected routes require `Authorization: Bearer <token>` header.
+**Imports** — All shared modules use flat imports because they are copied to the root of each Lambda package at build time:
+```python
+# Correct
+from config import settings
+from database import get_db
 
-### Auth
-| Method | Endpoint       | Body                          | Auth? |
-|--------|----------------|-------------------------------|-------|
-| POST   | /users         | `{name, email, password}`     | No    |
-| POST   | /users/login   | `{email, password}`           | No    |
-| GET    | /users/{id}    | —                             | Yes   |
-| PATCH  | /users/{id}    | `{name?, upi_id?, phone?}`    | Yes   |
+# Wrong — will break in Lambda
+from shared.config import settings
+```
 
-### Rooms
-| Method | Endpoint                         | Body / Notes           |
-|--------|----------------------------------|------------------------|
-| POST   | /rooms                           | `{name, address?}`     |
-| POST   | /rooms/join                      | `{room_code}`          |
-| GET    | /rooms/mine                      | Your rooms             |
-| GET    | /rooms/{id}/members              | —                      |
-| DELETE | /rooms/{id}/members/{user_id}    | Leave or remove        |
+**Money** — Always use `decimal.Decimal` for monetary values. Never use `float` for calculations. Only convert to `float` at the final JSON response boundary.
 
-### Expenses
-| Method | Endpoint                              | Notes                          |
-|--------|---------------------------------------|--------------------------------|
-| POST   | /expenses                             | Creates expense + splits       |
-| GET    | /expenses/room/{room_id}              | All room expenses              |
-| GET    | /expenses/balance/room/{room_id}      | Who owes whom (room-level)     |
-| GET    | /expenses/balance/{user_id}/room/{id} | User's net balance             |
-| PATCH  | /expenses/{id}/settle                 | Mark your share settled        |
-| DELETE | /expenses/{id}                        | Only payer can delete          |
-| GET    | /expenses/suggest/category?title=...  | Smart category prediction      |
-| GET    | /expenses/suggest/recurring/{room_id} | Monthly recurring suggestions  |
+**Cache** — Every cache read/write must be wrapped in `try/except`. A Redis failure should never surface as a 500 error to the user.
 
-### Payments
-| Method | Endpoint                       | Notes                          |
-|--------|--------------------------------|--------------------------------|
-| POST   | /payments                      | Record a payment               |
-| PATCH  | /payments/{id}/settle          | Recipient confirms settlement  |
-| GET    | /payments/user/{user_id}       | User's payment history         |
-| GET    | /payments/user/{user_id}/summary | Aggregated stats              |
-| GET    | /payments/room/{room_id}       | Room payment history           |
+**Route ordering** — In every router, fixed paths (`/me`, `/mine`, `/suggest/category`) must be registered before parameterised paths (`/{id}`). FastAPI matches in registration order.
 
 ---
 
-## 🤖 Smart Features
+## Built For Indian Flatmates
 
-### Category Auto-Detection
-When adding an expense, the frontend calls:
-```
-GET /expenses/suggest/category?title=electricity+bill
-→ { category: "electricity", confidence: "high", source: "keyword" }
-```
-The keyword engine maps merchant names (BigBasket → groceries, Airtel → utilities, etc.) with zero latency. Falls back to your historical spending pattern.
-
-### Recurring Suggestions
-```
-GET /expenses/suggest/recurring/{room_id}
-→ [{ title: "Electricity Bill", avg_amount: 2400, days_since: 28, message: "..." }]
-```
-Detects monthly patterns and prompts you to add recurring expenses before you forget.
+- Supports UPI reference IDs for payment tracking.
+- Category suggestions understand Indian context — Blinkit, Zepto, MSEDCL, Jio, and more.
+- Recurring reminders for rent, electricity, gas cylinders, and other monthly staples.
+- Deployed in `ap-south-1` (Mumbai) for low latency.
 
 ---
 
-## 💡 Adding a New Microservice
+## Tech Stack
 
-1. Copy any existing service folder as a template
-2. Update `config.py` (port, service_name)
-3. Write your models, services, routers
-4. Add to `docker-compose.yml`
-5. Add the route prefix → URL mapping in `gateway/main.py`
-
----
-
-## 🔒 Security Notes
-
-- All protected routes require a valid Supabase JWT
-- The gateway validates the token and injects `X-User-Id` — microservices trust this header
-- Service-role Supabase key is **only used server-side** (never sent to frontend)
-- Redis caches are invalidated on every write to avoid stale data
-- Row-Level Security (RLS) is enabled on all Supabase tables as a second layer
+| Layer | Technology |
+|---|---|
+| Compute | AWS Lambda |
+| API Framework | FastAPI + Mangum |
+| Auth | AWS Cognito (Google OAuth) |
+| Database | RDS PostgreSQL via RDS Proxy |
+| Cache | ElastiCache Serverless Redis |
+| Storage | Amazon S3 |
 
 ---
 
-## 🚧 Future Scope
+## License
 
-- [ ] Real-time balance updates via Supabase Realtime
-- [ ] Push notifications (FCM) for new expenses
-- [ ] Export expenses to PDF/CSV
-- [ ] Multi-room support per user (currently assumes room_id = 1)
-- [ ] AI expense categorization via Claude API
-- [ ] Recurring expense auto-creation via cron
+MIT — free to use, fork, and build on.
