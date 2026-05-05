@@ -7,8 +7,8 @@ from sqlalchemy.orm import Session
 
 from cache import cache_delete, cache_get, cache_set
 from models import User
-from s3_client import avatar_key as build_avatar_key
-from s3_client import generate_download_url, generate_upload_url
+from s3_utils import avatar_key as build_avatar_key
+from s3_utils import generate_download_url, generate_upload_url
 from schemas import UserUpdate
 
 

@@ -1,6 +1,7 @@
 import { useRoomStore } from '../../store/roomStore';
 import { useAuthStore } from '../../store/authStore';
 import Avatar from './Avatar';
+import React from 'react';
 
 type Page = 'dashboard' | 'expenses' | 'payments' | 'history' | 'profile' | 'room';
 
@@ -84,4 +85,3 @@ const styles: Record<string, React.CSSProperties> = {
   userEmail: { fontSize: 11, color: 'var(--text-tertiary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' },
 };
 
-import React from 'react';
