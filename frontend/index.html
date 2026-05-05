@@ -1,73 +1,88 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap');
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text x='50' y='70' font-size='80' font-weight='bold' text-anchor='middle' fill='%23ccff00'>F</text></svg>" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Flatmate - Expense Splitting Made Simple</title>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap');
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-:root {
-  /* Brand */
-  --lime: #ccff00;
-  --lime-dim: rgba(204,255,0,0.12);
-  --lime-border: rgba(204,255,0,0.3);
+      :root {
+        /* Brand */
+        --lime: #ccff00;
+        --lime-dim: rgba(204,255,0,0.12);
+        --lime-border: rgba(204,255,0,0.3);
 
-  /* Surfaces */
-  --bg-app:     #f4f4f2;
-  --bg-primary: #ffffff;
-  --bg-secondary:#f7f7f5;
-  --bg-tertiary: #efefed;
+        /* Surfaces */
+        --bg-app:     #f4f4f2;
+        --bg-primary: #ffffff;
+        --bg-secondary:#f7f7f5;
+        --bg-tertiary: #efefed;
 
-  /* Borders */
-  --border-light: rgba(0,0,0,0.07);
-  --border-mid:   rgba(0,0,0,0.12);
-  --border-heavy: rgba(0,0,0,0.2);
+        /* Borders */
+        --border-light: rgba(0,0,0,0.07);
+        --border-mid:   rgba(0,0,0,0.12);
+        --border-heavy: rgba(0,0,0,0.2);
 
-  /* Text */
-  --text-primary:   #0e0e0e;
-  --text-secondary: #5a5a58;
-  --text-tertiary:  #9a9a98;
-  --text-success:   #1a6b3a;
-  --text-danger:    #b91c1c;
-  --text-warning:   #92400e;
-  --text-info:      #1e40af;
+        /* Text */
+        --text-primary:   #0e0e0e;
+        --text-secondary: #5a5a58;
+        --text-tertiary:  #9a9a98;
+        --text-success:   #1a6b3a;
+        --text-danger:    #b91c1c;
+        --text-warning:   #92400e;
+        --text-info:      #1e40af;
 
-  /* Status bg */
-  --bg-success: #dcfce7;
-  --bg-danger:  #fee2e2;
-  --bg-warning: #fef3c7;
-  --bg-info:    #dbeafe;
+        /* Status bg */
+        --bg-success: #dcfce7;
+        --bg-danger:  #fee2e2;
+        --bg-warning: #fef3c7;
+        --bg-info:    #dbeafe;
 
-  /* Fonts */
-  --font-sans: 'DM Sans', sans-serif;
-  --font-mono: 'DM Mono', monospace;
+        /* Fonts */
+        --font-sans: 'DM Sans', sans-serif;
+        --font-mono: 'DM Mono', monospace;
 
-  /* Radii */
-  --r-sm: 6px;
-  --r-md: 10px;
-  --r-lg: 16px;
-  --r-xl: 22px;
+        /* Radii */
+        --r-sm: 6px;
+        --r-md: 10px;
+        --r-lg: 16px;
+        --r-xl: 22px;
 
-  /* Sidebar */
-  --sidebar-w: 224px;
+        /* Sidebar */
+        --sidebar-w: 224px;
 
-  /* Shadows */
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
-  --shadow-md: 0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
-  --shadow-lg: 0 8px 32px rgba(0,0,0,0.1), 0 2px 8px rgba(0,0,0,0.06);
-}
+        /* Shadows */
+        --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+        --shadow-md: 0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
+        --shadow-lg: 0 8px 32px rgba(0,0,0,0.1), 0 2px 8px rgba(0,0,0,0.06);
+      }
 
-html, body, #root {
-  height: 100%;
-  font-family: var(--font-sans);
-  background: var(--bg-app);
-  color: var(--text-primary);
-  -webkit-font-smoothing: antialiased;
-  font-size: 14px;
-  line-height: 1.5;
-}
+      html, body, #root {
+        height: 100%;
+        font-family: var(--font-sans);
+        background: var(--bg-app);
+        color: var(--text-primary);
+        -webkit-font-smoothing: antialiased;
+        font-size: 14px;
+        line-height: 1.5;
+      }
 
-button { font-family: var(--font-sans); cursor: pointer; }
-input, select, textarea { font-family: var(--font-sans); }
-a { text-decoration: none; color: inherit; }
+      button { font-family: var(--font-sans); cursor: pointer; }
+      input, select, textarea { font-family: var(--font-sans); }
+      a { text-decoration: none; color: inherit; }
 
-/* Scrollbar */
-::-webkit-scrollbar { width: 5px; height: 5px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border-mid); border-radius: 99px; }
+      /* Scrollbar */
+      ::-webkit-scrollbar { width: 5px; height: 5px; }
+      ::-webkit-scrollbar-track { background: transparent; }
+      ::-webkit-scrollbar-thumb { background: var(--border-mid); border-radius: 99px; }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
